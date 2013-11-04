@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<model-hints>
+	<model name="com.bvakili.portlet.integration.box.model.BoxToken">
+		<field name="boxTokenId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="accessToken" type="String" />
+		<field name="refreshToken" type="String" />
+		<field name="accessTokenExpiration" type="long" />
+		<field name="refreshTokenExpiration" type="long" />
+		<field name="callbackURL" type="String">
+			<hint name="max-length">5000</hint>
+		</field>
+		<field name="expired" type="boolean" />
+		<field name="repositoryId" type="long" />
+	</model>
+</model-hints>

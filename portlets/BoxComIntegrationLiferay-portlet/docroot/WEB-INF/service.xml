@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 6.2.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_6_2_0.dtd">
+<service-builder package-path="com.bvakili.portlet.integration.box" auto-namespace-tables="false">
+	<author>Bijan Vakili</author>
+	<namespace>boxcomintegration</namespace>
+
+	<entity name="BoxToken" local-service="true" remote-service="false">
+
+		<!-- PK fields -->
+
+		<column name="boxTokenId" type="long" primary="true" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="accessToken" type="String" />
+		<column name="refreshToken" type="String" />
+		<column name="accessTokenExpiration" type="long" />
+		<column name="refreshTokenExpiration" type="long" />
+		<column name="callbackURL" type="String" ></column>
+
+		<!-- Order -->
+
+		<column name="expired" type="boolean"></column>
+		<column name="repositoryId" type="long"></column>
+
+		<order by="desc">
+			<order-column name="createDate"></order-column>
+		</order>
+
+		<!-- Finder methods -->
+
+		<finder return-type="Collection" name="C_E">
+			<finder-column name="companyId" />
+			<finder-column name="expired"></finder-column>
+		</finder>
+		<finder name="R_E" return-type="Collection">
+			<finder-column name="repositoryId"></finder-column>
+			<finder-column name="expired"></finder-column>
+		</finder>
+		<reference entity="Company" package-path="com.liferay.portal"></reference>
+	</entity>
+	<entity name="BoxRepository" local-service="true" remote-service="false" >
+		<reference package-path="com.liferay.portal" entity="Repository" />
+	</entity>
+	<exceptions>
+		<exception>NotAuthenticatedToBox</exception>
+	</exceptions>
+</service-builder>

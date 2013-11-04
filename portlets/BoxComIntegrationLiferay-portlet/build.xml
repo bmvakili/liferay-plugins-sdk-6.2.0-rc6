@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE project>
+
+<project name="BoxComIntegrationLiferay-portlet" basedir="." default="deploy">
+	<import file="/opt/lr/62rc5/liferay-plugins-sdk-6.2.0-rc6/portlets/build-common-portlet.xml" />
+	<dirname file="${ant.file.build-common}" property="project.dir" />
+	<path id="project.classpath">
+		<pathelement path="${classpath}" />
+		<path refid="lib.classpath" />
+		<path>
+			<fileset dir="/opt/lr/62rc5/liferay-portal-6.2.0-ce-rc6/tomcat-7.0.42/webapps/ROOT/WEB-INF/lib/" includes="*.jar" />
+			<fileset dir="/opt/lr/62rc5/liferay-portal-6.2.0-ce-rc6/tomcat-7.0.42/lib/ext/">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+	</path>
+	<target name="format-source">
+		<copy todir="classes" overwrite="true" preservelastmodified="true">
+			<fileset dir="docroot/WEB-INF/src" includes="com/liferay/portal/tools/dependencies/*.properties" />
+			<fileset dir="docroot/WEB-INF/service" includes="com/liferay/portal/tools/dependencies/*.properties" />
+		</copy>
+
+		<java
+			classname="com.liferay.portal.tools.sourceformatter.SourceFormatter"
+			classpathref="project.classpath"
+			dir="${project.dir}"
+			fork="true"
+			newenvironment="true"
+		>
+			<jvmarg value="-Xmx512m" />
+			<jvmarg value="-Xss2048k" />
+			<jvmarg value="-Dsource.formatter.check.unprocessed.exceptions=${source.formatter.check.unprocessed.exceptions}" />
+			<jvmarg value="-Dsource.formatter.excludes=${source.formatter.excludes}" />
+		</java>
+
+		<delete file="ServiceBuilder.temp" />
+	</target>
+</project>
