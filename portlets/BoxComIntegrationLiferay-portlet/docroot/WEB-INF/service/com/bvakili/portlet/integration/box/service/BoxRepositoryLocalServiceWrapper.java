@@ -59,6 +59,11 @@ public class BoxRepositoryLocalServiceWrapper
 			arguments);
 	}
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this interface directly. Always use {@link com.bvakili.portlet.integration.box.service.BoxRepositoryLocalServiceUtil} to access the box repository local service.
+	*/
 	@Override
 	public com.liferay.portal.kernel.repository.model.FileEntry toFileEntry(
 		long repositoryId, java.lang.Object object)

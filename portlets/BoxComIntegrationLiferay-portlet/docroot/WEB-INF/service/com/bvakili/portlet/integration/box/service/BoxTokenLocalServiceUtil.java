@@ -275,15 +275,6 @@ public class BoxTokenLocalServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
-	public static java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens() {
-		return getService().getActiveTokens();
-	}
-
-	public static java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens(
-		long repositoryId) {
-		return getService().getActiveTokens(repositoryId);
-	}
-
 	public static void createNewToken(long companyId,
 		java.lang.String fullName, long userId, java.lang.String callbackURL,
 		com.liferay.portal.model.Repository repo,
@@ -291,6 +282,20 @@ public class BoxTokenLocalServiceUtil {
 		getService()
 			.createNewToken(companyId, fullName, userId, callbackURL, repo,
 			bToken);
+	}
+
+	public static java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens(
+		long repositoryId) {
+		return getService().getActiveTokens(repositoryId);
+	}
+
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this interface directly. Always use {@link com.bvakili.portlet.integration.box.service.BoxTokenLocalServiceUtil} to access the box token local service.
+	*/
+	public static java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens() {
+		return getService().getActiveTokens();
 	}
 
 	public static void clearService() {

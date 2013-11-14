@@ -249,15 +249,20 @@ public interface BoxTokenLocalService extends BaseLocalService,
 		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
 		throws java.lang.Throwable;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens();
+	public void createNewToken(long companyId, java.lang.String fullName,
+		long userId, java.lang.String callbackURL,
+		com.liferay.portal.model.Repository repo,
+		com.box.boxjavalibv2.dao.BoxOAuthToken bToken);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens(
 		long repositoryId);
 
-	public void createNewToken(long companyId, java.lang.String fullName,
-		long userId, java.lang.String callbackURL,
-		com.liferay.portal.model.Repository repo,
-		com.box.boxjavalibv2.dao.BoxOAuthToken bToken);
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this interface directly. Always use {@link com.bvakili.portlet.integration.box.service.BoxTokenLocalServiceUtil} to access the box token local service.
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens();
 }

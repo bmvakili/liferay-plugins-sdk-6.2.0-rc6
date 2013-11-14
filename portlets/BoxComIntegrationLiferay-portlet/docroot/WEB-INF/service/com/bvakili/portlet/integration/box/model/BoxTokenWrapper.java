@@ -525,7 +525,8 @@ public class BoxTokenWrapper implements BoxToken, ModelWrapper<BoxToken> {
 	}
 
 	@Override
-	public int compareTo(BoxToken boxToken) {
+	public int compareTo(
+		com.bvakili.portlet.integration.box.model.BoxToken boxToken) {
 		return _boxToken.compareTo(boxToken);
 	}
 
@@ -535,17 +536,17 @@ public class BoxTokenWrapper implements BoxToken, ModelWrapper<BoxToken> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<BoxToken> toCacheModel() {
+	public com.liferay.portal.model.CacheModel<com.bvakili.portlet.integration.box.model.BoxToken> toCacheModel() {
 		return _boxToken.toCacheModel();
 	}
 
 	@Override
-	public BoxToken toEscapedModel() {
+	public com.bvakili.portlet.integration.box.model.BoxToken toEscapedModel() {
 		return new BoxTokenWrapper(_boxToken.toEscapedModel());
 	}
 
 	@Override
-	public BoxToken toUnescapedModel() {
+	public com.bvakili.portlet.integration.box.model.BoxToken toUnescapedModel() {
 		return new BoxTokenWrapper(_boxToken.toUnescapedModel());
 	}
 

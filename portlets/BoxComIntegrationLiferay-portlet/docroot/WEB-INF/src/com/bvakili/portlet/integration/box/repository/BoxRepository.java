@@ -1,6 +1,8 @@
 package com.bvakili.portlet.integration.box.repository;
 
 import static com.bvakili.portlet.integration.box.util.Constants.BOX_ACCOUNT_ROOT_FOLDER_ID;
+import static com.bvakili.portlet.integration.box.util.Constants.NOACTIVETOKENS;
+
 
 import com.box.boxjavalibv2.BoxClient;
 import com.box.boxjavalibv2.dao.BoxCollection;
@@ -14,21 +16,23 @@ import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
 import com.box.boxjavalibv2.exceptions.BoxJSONException;
 import com.box.boxjavalibv2.exceptions.BoxServerException;
 import com.box.boxjavalibv2.exceptions.BoxUnexpectedHttpStatusException;
+import com.box.boxjavalibv2.requests.requestobjects.BoxOAuthRequestObject;
 import com.box.boxjavalibv2.resourcemanagers.BoxFilesManager;
 import com.box.boxjavalibv2.resourcemanagers.BoxFoldersManager;
+import com.box.boxjavalibv2.resourcemanagers.BoxOAuthManager;
 import com.box.boxjavalibv2.resourcemanagers.BoxSearchManager;
 import com.box.restclientv2.exceptions.BoxRestException;
-
+import com.bvakili.portlet.integration.box.NoActiveTokensFoundException;
 import com.bvakili.portlet.integration.box.NotAuthenticatedToBoxException;
 import com.bvakili.portlet.integration.box.model.BoxFileEntry;
 import com.bvakili.portlet.integration.box.model.BoxToken;
 import com.bvakili.portlet.integration.box.service.BoxTokenLocalServiceUtil;
 import com.bvakili.portlet.integration.box.util.BoxUtil;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.oauth.OAuthManager;
 import com.liferay.portal.kernel.repository.RepositoryException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
@@ -56,7 +60,6 @@ import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelNameCo
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelSizeComparator;
 
 import java.io.InputStream;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +67,7 @@ import java.util.Map;
 
 import static com.bvakili.portlet.integration.box.util.Constants.REFRESH_TOKEN_EXPIRATION_DURATION_MILLISECONDS;
 public class BoxRepository extends BaseBoxRepository {
+
 
 	protected BoxClient _client;
 
@@ -171,7 +175,7 @@ public class BoxRepository extends BaseBoxRepository {
 		return repositoryEntry.getMappedId();
 	}
 
-	public List<BoxFile> getAllFileVersions(String fileId) throws AuthFatalFailureException, BoxRestException, BoxServerException, NotAuthenticatedToBoxException, SystemException {
+	public List<BoxFile> getAllFileVersions(String fileId) throws AuthFatalFailureException, BoxRestException, BoxServerException, NotAuthenticatedToBoxException, SystemException, NoActiveTokensFoundException {
 		List<BoxFile> boxFiles = new ArrayList<BoxFile>();
 		List<BoxFileVersion> boxFileVersions = getBoxClient().getFilesManager().getFileVersions(fileId, null);
 
@@ -184,12 +188,17 @@ public class BoxRepository extends BaseBoxRepository {
 
 	public BoxClient getBoxClient() throws NotAuthenticatedToBoxException,
 			BoxRestException, BoxServerException, AuthFatalFailureException,
-			SystemException {
+			SystemException, NoActiveTokensFoundException {
 		if (_client != null && _client.isAuthenticated()) {
+			System.out.println("XXXXXXXXXXXXXXXXXXXXXXXxexpires in : "+ _client.getAuthData().getExpiresIn());
+
 			return _client;
 		}
 
 		List<BoxToken> tokens = BoxTokenLocalServiceUtil.getActiveTokens(getRepositoryId());
+		if (tokens.size() == 0) {
+			throw new NoActiveTokensFoundException();
+		}
 		BoxToken token = tokens.get(0);
 		BoxClient client = null;
 		String accessToken = token.getAccessToken();
@@ -202,7 +211,13 @@ public class BoxRepository extends BaseBoxRepository {
 			}
 		}
 
-		client = BoxUtil.refreshToken(refreshToken, callbackURL);
+		try {
+			client = BoxUtil.refreshToken(refreshToken, callbackURL);
+		} catch (NoActiveTokensFoundException e) {
+			token.setExpired(true);
+			BoxTokenLocalServiceUtil.updateBoxToken(token);
+			throw new NoActiveTokensFoundException("The token has likely expired; get new one.");
+		}
 		BoxOAuthToken newToken = client.getAuthData();
 		token.setAccessToken(newToken.getAccessToken());
 		token.setAccessTokenExpiration(System.currentTimeMillis() + (newToken.getExpiresIn() * 1000));
@@ -213,7 +228,7 @@ public class BoxRepository extends BaseBoxRepository {
 		return client;
 	}
 
-	public BoxFile getFile(String fileId) throws AuthFatalFailureException, BoxRestException, BoxServerException, NotAuthenticatedToBoxException, SystemException {
+	public BoxFile getFile(String fileId) throws AuthFatalFailureException, BoxRestException, BoxServerException, NotAuthenticatedToBoxException, SystemException, NoActiveTokensFoundException {
 		return getBoxClient().getFilesManager().getFile(fileId, null);
 	}
 
@@ -261,7 +276,11 @@ public class BoxRepository extends BaseBoxRepository {
 	public List<Object> getFoldersAndFileEntries(long folderId, int start,
 			int end, OrderByComparator obc) throws SystemException {
 		List<Object> foldersAndFileEntries = null;
-		foldersAndFileEntries = getFoldersAndFileEntries(folderId);
+		try {
+			foldersAndFileEntries = getFoldersAndFileEntries(folderId);
+		} catch (NoActiveTokensFoundException e) {
+			throw new SystemException(NOACTIVETOKENS);
+		}
 
 		return subList(foldersAndFileEntries, start, end, obc);
 	}
@@ -277,7 +296,13 @@ public class BoxRepository extends BaseBoxRepository {
 	@Override
 	public int getFoldersAndFileEntriesCount(long folderId)
 			throws SystemException {
-		List<Object> foldersAndFileEntries = getFoldersAndFileEntries(folderId);
+		List<Object> foldersAndFileEntries;
+		try {
+			foldersAndFileEntries = getFoldersAndFileEntries(folderId);
+		} catch (NoActiveTokensFoundException e) {
+
+			throw new SystemException(NOACTIVETOKENS);
+		}
 		return foldersAndFileEntries.size();
 	}
 
@@ -411,7 +436,7 @@ public class BoxRepository extends BaseBoxRepository {
 //
 //	}
 
-	protected List<Object> getFoldersAndFileEntries(long folderId) throws RepositoryException {
+	protected List<Object> getFoldersAndFileEntries(long folderId) throws RepositoryException, NoActiveTokensFoundException {
 		cacheFoldersAndFileEntries(folderId);
 
 		Map<Long, List<Object>> foldersAndFileEntriesCache =
@@ -420,9 +445,9 @@ public class BoxRepository extends BaseBoxRepository {
 			return foldersAndFileEntriesCache.get(folderId);
 	}
 
-	protected void cacheFoldersAndFileEntries(long folderId) throws RepositoryException {
+	protected void cacheFoldersAndFileEntries(long folderId) throws RepositoryException, NoActiveTokensFoundException {
 		Map<Long, List<Object>> foldersAndFileEntriesCache =
-				_foldersAndFileEntriesCache.get();
+				_foldersAndFileEntriesCache.get(); 
 			List<Object> foldersAndFileEntries = new ArrayList<Object>();
 			List<Folder> folders = new ArrayList<Folder>();
 			List<FileEntry> fileEntries = new ArrayList<FileEntry>();
@@ -525,6 +550,8 @@ public class BoxRepository extends BaseBoxRepository {
 				// TODO Auto-generated catch block
 
 				e.printStackTrace();
+			} catch (NoActiveTokensFoundException e) {
+				throw new NoActiveTokensFoundException(e);
 			}
 			catch (Exception e) {
 				throw new RepositoryException(e);
@@ -745,11 +772,11 @@ public class BoxRepository extends BaseBoxRepository {
 		return retVal;
 	}
 
-	public InputStream getFileInputStream(String fileId) throws AuthFatalFailureException, BoxRestException, BoxServerException, NotAuthenticatedToBoxException, SystemException {
+	public InputStream getFileInputStream(String fileId) throws AuthFatalFailureException, BoxRestException, BoxServerException, NotAuthenticatedToBoxException, SystemException, NoActiveTokensFoundException {
 		return getBoxClient().getFilesManager().downloadFile(fileId, null);
 	}
 
-	protected List<FileEntry> getFiles() throws NotAuthenticatedToBoxException, SystemException {
+	protected List<FileEntry> getFiles() throws NotAuthenticatedToBoxException, SystemException, NoActiveTokensFoundException {
 		try {
 			List<FileEntry> fileEntries = new ArrayList<FileEntry>();
 			BoxClient client = getBoxClient();

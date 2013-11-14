@@ -63,6 +63,11 @@ public class BoxRepositoryLocalServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this interface directly. Always use {@link com.bvakili.portlet.integration.box.service.BoxRepositoryLocalServiceUtil} to access the box repository local service.
+	*/
 	public static com.liferay.portal.kernel.repository.model.FileEntry toFileEntry(
 		long repositoryId, java.lang.Object object)
 		throws com.liferay.portal.kernel.exception.PortalException,

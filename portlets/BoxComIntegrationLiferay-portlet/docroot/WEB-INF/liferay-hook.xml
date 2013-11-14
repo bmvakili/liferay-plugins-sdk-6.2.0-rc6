@@ -13,4 +13,8 @@
         <struts-action-path>/box_integration/edit_account</struts-action-path>
         <struts-action-impl>com.bvakili.portlet.integration.box.action.EditAccountAction</struts-action-impl>
     </struts-action>
+    <struts-action>
+        <struts-action-path>/document_library/view</struts-action-path>
+        <struts-action-impl>com.bvakili.portlet.integration.box.action.ViewAction</struts-action-impl>
+    </struts-action>
 </hook>

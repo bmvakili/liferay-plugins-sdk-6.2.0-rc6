@@ -287,8 +287,12 @@ public class BoxTokenLocalServiceWrapper implements BoxTokenLocalService,
 	}
 
 	@Override
-	public java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens() {
-		return _boxTokenLocalService.getActiveTokens();
+	public void createNewToken(long companyId, java.lang.String fullName,
+		long userId, java.lang.String callbackURL,
+		com.liferay.portal.model.Repository repo,
+		com.box.boxjavalibv2.dao.BoxOAuthToken bToken) {
+		_boxTokenLocalService.createNewToken(companyId, fullName, userId,
+			callbackURL, repo, bToken);
 	}
 
 	@Override
@@ -297,13 +301,14 @@ public class BoxTokenLocalServiceWrapper implements BoxTokenLocalService,
 		return _boxTokenLocalService.getActiveTokens(repositoryId);
 	}
 
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this interface directly. Always use {@link com.bvakili.portlet.integration.box.service.BoxTokenLocalServiceUtil} to access the box token local service.
+	*/
 	@Override
-	public void createNewToken(long companyId, java.lang.String fullName,
-		long userId, java.lang.String callbackURL,
-		com.liferay.portal.model.Repository repo,
-		com.box.boxjavalibv2.dao.BoxOAuthToken bToken) {
-		_boxTokenLocalService.createNewToken(companyId, fullName, userId,
-			callbackURL, repo, bToken);
+	public java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens() {
+		return _boxTokenLocalService.getActiveTokens();
 	}
 
 	/**

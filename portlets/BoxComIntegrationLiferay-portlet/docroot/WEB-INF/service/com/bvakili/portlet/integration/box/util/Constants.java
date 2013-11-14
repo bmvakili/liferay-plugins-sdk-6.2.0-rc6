@@ -5,6 +5,7 @@ import com.liferay.util.portlet.PortletProps;
 
 public class Constants {
 
+	public static final String NOACTIVETOKENS = "NOACTIVETOKENS";
 	protected static final String KEY = GetterUtil.getString(PortletProps.get("com.box.api.key"));
 
 	protected static final String SECRET = GetterUtil.getString(PortletProps.get("com.box.api.secret"));

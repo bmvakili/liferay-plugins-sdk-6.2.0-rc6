@@ -234,6 +234,11 @@ public class ClpSerializer {
 		}
 
 		if (className.equals(
+					"com.bvakili.portlet.integration.box.NoActiveTokensFoundException")) {
+			return new com.bvakili.portlet.integration.box.NoActiveTokensFoundException();
+		}
+
+		if (className.equals(
 					"com.bvakili.portlet.integration.box.NotAuthenticatedToBoxException")) {
 			return new com.bvakili.portlet.integration.box.NotAuthenticatedToBoxException();
 		}

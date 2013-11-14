@@ -1,12 +1,14 @@
 
 package com.bvakili.portlet.integration.box.action;
 
+import com.bvakili.portlet.integration.box.model.BoxToken;
+import com.bvakili.portlet.integration.box.service.BoxTokenLocalServiceUtil;
+import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,7 +16,6 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
@@ -25,6 +26,8 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 @Component
 @RequestMapping(value = "VIEW")
 public class BoxComController {
+
+	private static final String CLOSE_WINDOW_STATIC_HTML_JS = "<!DOCTYPE html><html><head><script type='text/javascript'>window.close()</script></head></html>";
 
 	@ResourceMapping
 	public void catchAll(ResourceRequest request, ResourceResponse response) {
@@ -59,6 +62,15 @@ public class BoxComController {
 					PrintWriter writer = response.getWriter();
 					writer.append("o," + code);
 					writer.close();
+					
+					try {
+						//long newId = CounterLocalServiceUtil.increment();
+						//BoxToken token = BoxTokenLocalServiceUtil.createBoxToken(newId);
+						//BoxTokenLocalServiceUtil.createNewToken(companyId, fullName, userId, callbackURL, repo, bToken);
+						
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
 				}
 				else {
 					PrintWriter writer = response.getWriter();
@@ -129,6 +141,10 @@ public class BoxComController {
 					values[0] = "done";
 					values[1] = code;
 
+
+					PrintWriter writer = response.getWriter();
+					writer.append(CLOSE_WINDOW_STATIC_HTML_JS);
+					writer.close();
 				}
 				else {
 					PrintWriter writer = response.getWriter();
@@ -139,7 +155,7 @@ public class BoxComController {
 			else {
 				PrintWriter writer = response.getWriter();
 				writer.append("f");
-				writer.close();
+				writer.close(); 
 			}
 		}
 		catch (IOException e) {
@@ -150,8 +166,6 @@ public class BoxComController {
 
 	@RequestMapping
 	public String request(RenderRequest request, RenderResponse response) {
-
-		request.setAttribute("hi", "hello! !!!! 123  ");
 		return "view";
 	}
 

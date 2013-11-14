@@ -114,21 +114,21 @@ public class BoxTokenLocalServiceClp implements BoxTokenLocalService {
 
 		_methodParameterTypes17 = new String[] { "java.lang.String" };
 
-		_methodName19 = "getActiveTokens";
+		_methodName19 = "createNewToken";
 
-		_methodParameterTypes19 = new String[] {  };
+		_methodParameterTypes19 = new String[] {
+				"long", "java.lang.String", "long", "java.lang.String",
+				"com.liferay.portal.model.Repository",
+				"com.box.boxjavalibv2.dao.BoxOAuthToken"
+			};
 
 		_methodName20 = "getActiveTokens";
 
 		_methodParameterTypes20 = new String[] { "long" };
 
-		_methodName21 = "createNewToken";
+		_methodName21 = "getActiveTokens";
 
-		_methodParameterTypes21 = new String[] {
-				"long", "java.lang.String", "long", "java.lang.String",
-				"com.liferay.portal.model.Repository",
-				"com.box.boxjavalibv2.dao.BoxOAuthToken"
-			};
+		_methodParameterTypes21 = new String[] {  };
 	}
 
 	@Override
@@ -682,12 +682,26 @@ public class BoxTokenLocalServiceClp implements BoxTokenLocalService {
 	}
 
 	@Override
-	public java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens() {
-		Object returnObj = null;
-
+	public void createNewToken(long companyId, java.lang.String fullName,
+		long userId, java.lang.String callbackURL,
+		com.liferay.portal.model.Repository repo,
+		com.box.boxjavalibv2.dao.BoxOAuthToken bToken) {
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName19,
-					_methodParameterTypes19, new Object[] {  });
+			_invokableLocalService.invokeMethod(_methodName19,
+				_methodParameterTypes19,
+				new Object[] {
+					companyId,
+					
+				ClpSerializer.translateInput(fullName),
+					
+				userId,
+					
+				ClpSerializer.translateInput(callbackURL),
+					
+				ClpSerializer.translateInput(repo),
+					
+				ClpSerializer.translateInput(bToken)
+				});
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -700,8 +714,6 @@ public class BoxTokenLocalServiceClp implements BoxTokenLocalService {
 					" is not a valid exception");
 			}
 		}
-
-		return (java.util.List<com.bvakili.portlet.integration.box.model.BoxToken>)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -729,26 +741,12 @@ public class BoxTokenLocalServiceClp implements BoxTokenLocalService {
 	}
 
 	@Override
-	public void createNewToken(long companyId, java.lang.String fullName,
-		long userId, java.lang.String callbackURL,
-		com.liferay.portal.model.Repository repo,
-		com.box.boxjavalibv2.dao.BoxOAuthToken bToken) {
+	public java.util.List<com.bvakili.portlet.integration.box.model.BoxToken> getActiveTokens() {
+		Object returnObj = null;
+
 		try {
-			_invokableLocalService.invokeMethod(_methodName21,
-				_methodParameterTypes21,
-				new Object[] {
-					companyId,
-					
-				ClpSerializer.translateInput(fullName),
-					
-				userId,
-					
-				ClpSerializer.translateInput(callbackURL),
-					
-				ClpSerializer.translateInput(repo),
-					
-				ClpSerializer.translateInput(bToken)
-				});
+			returnObj = _invokableLocalService.invokeMethod(_methodName21,
+					_methodParameterTypes21, new Object[] {  });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -761,6 +759,8 @@ public class BoxTokenLocalServiceClp implements BoxTokenLocalService {
 					" is not a valid exception");
 			}
 		}
+
+		return (java.util.List<com.bvakili.portlet.integration.box.model.BoxToken>)ClpSerializer.translateOutput(returnObj);
 	}
 
 	private InvokableLocalService _invokableLocalService;

@@ -2,16 +2,17 @@ package com.bvakili.portlet.integration.box.action;
 
 import com.box.boxjavalibv2.BoxClient;
 import com.box.boxjavalibv2.dao.BoxOAuthToken;
-
+import com.bvakili.portlet.integration.box.NoActiveTokensFoundException;
 import com.bvakili.portlet.integration.box.service.BoxTokenLocalServiceUtil;
 import com.bvakili.portlet.integration.box.util.BoxUtil;
-
 import com.liferay.portal.NoSuchRepositoryException;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.struts.BaseStrutsPortletAction;
 import com.liferay.portal.kernel.struts.StrutsPortletAction;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.model.Repository;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.RepositoryLocalServiceUtil;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -46,8 +47,21 @@ public class EditRepositoryAction extends BaseStrutsPortletAction {
 			PortletConfig portletConfig, RenderRequest renderRequest,
 			RenderResponse renderResponse) throws Exception {
 
-		return originalStrutsPortletAction.render(
-				originalStrutsPortletAction, portletConfig, renderRequest, renderResponse);
+		String retVal = "";
+		try {
+			String origForward =  originalStrutsPortletAction.render(
+					originalStrutsPortletAction, portletConfig, renderRequest, renderResponse);
+			retVal = origForward;
+		} catch(Exception e) {
+			if (e instanceof NoActiveTokensFoundException) {
+				
+			} else {
+				throw e;
+			}
+		}
+	
+
+		return retVal;
 	}
 
 	@Override
@@ -81,10 +95,7 @@ public class EditRepositoryAction extends BaseStrutsPortletAction {
 			String description = ParamUtil.getString(actionRequest, "description");
 
 			if (repositoryId <= 0) {
-
-				//Repository repo = RepositoryLocalServiceUtil.getRepository(themeDisplay.getScopeGroupId(), portletDisplay.getId());
 				Repository repo = null;
-
 				try {
 					repo = RepositoryLocalServiceUtil.getRepository(themeDisplay.getScopeGroupId(), name, "20");
 				} catch (Exception e) {
@@ -99,13 +110,17 @@ public class EditRepositoryAction extends BaseStrutsPortletAction {
 					throw new NoSuchRepositoryException();
 				}
 
-				BoxClient client = BoxUtil.getAuthenticatedClient(code, callbackURL);
-				BoxOAuthToken bToken = client.getAuthData();
-				long companyId = themeDisplay.getCompanyId();
-				String fullName = themeDisplay.getUser().getFullName();
-				long userId = themeDisplay.getUserId();
-
-				BoxTokenLocalServiceUtil.createNewToken(companyId, fullName, userId, callbackURL, repo, bToken);;
+				try {
+					BoxClient client = BoxUtil.getAuthenticatedClient(code, callbackURL);
+					BoxOAuthToken bToken = client.getAuthData();
+					long companyId = themeDisplay.getCompanyId();
+					String fullName = themeDisplay.getUser().getFullName();
+					long userId = themeDisplay.getUserId();
+	
+					BoxTokenLocalServiceUtil.createNewToken(companyId, fullName, userId, callbackURL, repo, bToken);;
+				} catch(Exception e) {
+					
+				}
 			}
 	}
 

@@ -9,6 +9,7 @@ import com.box.boxjavalibv2.exceptions.BoxServerException;
 import com.box.boxjavalibv2.requests.requestobjects.BoxOAuthRequestObject;
 import com.box.boxjavalibv2.resourcemanagers.BoxOAuthManager;
 import com.box.restclientv2.exceptions.BoxRestException;
+import com.bvakili.portlet.integration.box.NoActiveTokensFoundException;
 
 import java.util.List;
 
@@ -38,12 +39,17 @@ public class BoxUtil {
 		return folder;
 	}
 
-	public static BoxClient refreshToken(String refreshToken, String callbackURL) throws AuthFatalFailureException, BoxRestException, BoxServerException {
+	public static BoxClient refreshToken(String refreshToken, String callbackURL) throws AuthFatalFailureException, BoxRestException, BoxServerException, NoActiveTokensFoundException {
 		BoxClient client = new BoxClient(KEY, SECRET);
 		BoxOAuthRequestObject obj = BoxOAuthRequestObject.refreshOAuthRequestObject(refreshToken, KEY, SECRET);
 		BoxOAuthManager manager = client.getOAuthManager();
-		BoxOAuthToken bt = manager.createOAuth(obj);
-		client.authenticate(bt);
+		try {
+			BoxOAuthToken bt = manager.createOAuth(obj);
+			client.authenticate(bt);
+		} catch (NullPointerException e) {
+			// the response from server was null; refresh token is bad
+			throw new NoActiveTokensFoundException();
+		}
 		return client;
 	}
 

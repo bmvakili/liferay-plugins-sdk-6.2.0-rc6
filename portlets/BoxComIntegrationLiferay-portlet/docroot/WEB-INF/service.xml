@@ -52,5 +52,6 @@
 	</entity>
 	<exceptions>
 		<exception>NotAuthenticatedToBox</exception>
+        <exception>NoActiveTokensFound</exception>
 	</exceptions>
 </service-builder>

@@ -114,21 +114,21 @@ public class BoxTokenLocalServiceClpInvoker {
 
 		_methodParameterTypes41 = new String[] { "java.lang.String" };
 
-		_methodName46 = "getActiveTokens";
+		_methodName46 = "createNewToken";
 
-		_methodParameterTypes46 = new String[] {  };
+		_methodParameterTypes46 = new String[] {
+				"long", "java.lang.String", "long", "java.lang.String",
+				"com.liferay.portal.model.Repository",
+				"com.box.boxjavalibv2.dao.BoxOAuthToken"
+			};
 
 		_methodName47 = "getActiveTokens";
 
 		_methodParameterTypes47 = new String[] { "long" };
 
-		_methodName48 = "createNewToken";
+		_methodName48 = "getActiveTokens";
 
-		_methodParameterTypes48 = new String[] {
-				"long", "java.lang.String", "long", "java.lang.String",
-				"com.liferay.portal.model.Repository",
-				"com.box.boxjavalibv2.dao.BoxOAuthToken"
-			};
+		_methodParameterTypes48 = new String[] {  };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -234,7 +234,14 @@ public class BoxTokenLocalServiceClpInvoker {
 
 		if (_methodName46.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes46, parameterTypes)) {
-			return BoxTokenLocalServiceUtil.getActiveTokens();
+			BoxTokenLocalServiceUtil.createNewToken(((Long)arguments[0]).longValue(),
+				(java.lang.String)arguments[1],
+				((Long)arguments[2]).longValue(),
+				(java.lang.String)arguments[3],
+				(com.liferay.portal.model.Repository)arguments[4],
+				(com.box.boxjavalibv2.dao.BoxOAuthToken)arguments[5]);
+
+			return null;
 		}
 
 		if (_methodName47.equals(name) &&
@@ -244,14 +251,7 @@ public class BoxTokenLocalServiceClpInvoker {
 
 		if (_methodName48.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes48, parameterTypes)) {
-			BoxTokenLocalServiceUtil.createNewToken(((Long)arguments[0]).longValue(),
-				(java.lang.String)arguments[1],
-				((Long)arguments[2]).longValue(),
-				(java.lang.String)arguments[3],
-				(com.liferay.portal.model.Repository)arguments[4],
-				(com.box.boxjavalibv2.dao.BoxOAuthToken)arguments[5]);
-
-			return null;
+			return BoxTokenLocalServiceUtil.getActiveTokens();
 		}
 
 		throw new UnsupportedOperationException();

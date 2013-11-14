@@ -4,12 +4,11 @@ import com.box.boxjavalibv2.dao.BoxFile;
 import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
 import com.box.boxjavalibv2.exceptions.BoxServerException;
 import com.box.restclientv2.exceptions.BoxRestException;
-
+import com.bvakili.portlet.integration.box.NoActiveTokensFoundException;
 import com.bvakili.portlet.integration.box.NotAuthenticatedToBoxException;
 import com.bvakili.portlet.integration.box.repository.BoxRepository;
 import com.bvakili.portlet.integration.box.service.BoxRepositoryLocalServiceUtil;
 import com.bvakili.portlet.integration.box.util.BoxUtil;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.StagedModelType;
@@ -35,7 +34,6 @@ import com.liferay.portlet.documentlibrary.util.DLUtil;
 
 import java.io.InputStream;
 import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -645,7 +643,7 @@ public class BoxFileEntry extends BoxModel implements FileEntry {
 		return _boxRepository;
 	}
 
-	private List<BoxFile> getAllVersions(String fileId) throws AuthFatalFailureException, BoxRestException, BoxServerException, NotAuthenticatedToBoxException, SystemException {
+	private List<BoxFile> getAllVersions(String fileId) throws AuthFatalFailureException, BoxRestException, BoxServerException, NotAuthenticatedToBoxException, SystemException, NoActiveTokensFoundException {
 		return _boxRepository.getAllFileVersions(fileId);
 	}
 
